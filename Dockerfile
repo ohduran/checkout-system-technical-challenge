@@ -2,9 +2,9 @@ FROM ruby:latest
 
 RUN mkdir -p /var/app
 
-COPY ./backend/Gemfile Gemfile
+COPY ./checkout/Gemfile Gemfile
 
 RUN bundle install
 
-COPY ./backend /var/app
+COPY . /var/app
 WORKDIR /var/app
