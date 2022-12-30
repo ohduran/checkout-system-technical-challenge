@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :product do
-    name { 'Green Tea' }
-    code { 'GR1' }
-    price { 3.11 }
+    name { Faker::Food.dish }
+    code { Faker::Alphanumeric.alphanumeric.upcase }
+    price { Faker::Number.decimal(l_digits: 2) }
   end
 end

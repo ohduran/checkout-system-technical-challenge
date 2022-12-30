@@ -1,10 +1,11 @@
 class Product < ApplicationRecord
-  attribute :code
-  attribute :name
-  attribute :price
+  attribute :code, :string
+  attribute :name, :string
+  attribute :price, :decimal
 
   has_many :line_items
   has_many :baskets, through: :line_items
+  has_and_belongs_to_many :offers
 
   validates :name, :code, :price, presence: true
 
