@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# The store has a series of items for purchase.
 class Product < ApplicationRecord
   attribute :code, :string
   attribute :name, :string
