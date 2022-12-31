@@ -2,6 +2,8 @@
 
 # Each basket consist of a series of LineItems
 class LineItem < ApplicationRecord
+  include Memery
+
   attribute :quantity, :integer
 
   belongs_to :basket
@@ -21,7 +23,7 @@ class LineItem < ApplicationRecord
     applicable_offers.sum { |offer| offer.discount(quantity: quantity, product: product) }
   end
 
-  def applicable_offers
+  memoize def applicable_offers
     product.offers.where('quantity_to_buy <= ?', quantity)
   end
 end
