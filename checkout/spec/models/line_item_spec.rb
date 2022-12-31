@@ -3,30 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe LineItem, type: :model do
-  context 'before creation' do
-    let(:basket) { create(:basket) }
-    let(:product) { create(:product) }
-    it 'must have basket, LineItem and quantity' do
-      expect { LineItem.create! }.to raise_error(ActiveRecord::RecordInvalid)
-      expect { LineItem.create!(product: product, basket: basket) }.to raise_error(ActiveRecord::RecordInvalid)
-      expect { LineItem.create!(product: product, quantity: 3) }.to raise_error(ActiveRecord::RecordInvalid)
-      expect(LineItem.create!(product: product, basket: basket, quantity: 3)).to be
-    end
-
-    it 'must have price greater than or equal to 0' do
-      expect do
-        LineItem.create!(product: product, basket: basket, quantity: -3)
-      end.to raise_error(ActiveRecord::RecordInvalid)
-      expect(LineItem.create!(product: product, basket: basket, quantity: 0)).to be
-    end
-
-    it 'cannot have quantity that is not a number' do
-      expect do
-        LineItem.create!(product: product, basket: basket, quantity: Faker::Alphanumeric.alphanumeric)
-      end.to raise_error(ActiveRecord::RecordInvalid)
-    end
-  end
-
   context 'when calculating total' do
     context 'and there is no special discount' do
       let(:product) { create(:product) }
@@ -57,18 +33,6 @@ RSpec.describe LineItem, type: :model do
         let(:line_item) { create(:line_item, product: product, quantity: 2) }
         it 'calculates total as just one time the price of the product' do
           expect(line_item.total).to eq(1 * product.price)
-        end
-      end
-      context 'and there are three items' do
-        let(:line_item) { create(:line_item, product: product, quantity: 3) }
-        it 'calculates total as just two times the price of the product' do
-          expect(line_item.total).to eq(2 * product.price)
-        end
-      end
-      context 'and there are four items' do
-        let(:line_item) { create(:line_item, product: product, quantity: 4) }
-        it 'calculates total as just two times the price of the product' do
-          expect(line_item.total).to eq(2 * product.price)
         end
       end
     end
