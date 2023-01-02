@@ -1,10 +1,10 @@
 FROM ruby:latest
 
-RUN mkdir -p /var/app
+RUN mkdir -p /checkout
 
 COPY ./checkout/Gemfile Gemfile
 
 RUN bundle install
 
-COPY . /var/app
-WORKDIR /var/app
+COPY . /checkout
+WORKDIR /checkout
