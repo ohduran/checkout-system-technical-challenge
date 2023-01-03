@@ -47,4 +47,20 @@ RSpec.describe 'Baskets', type: :request do
       end
     end
   end
+
+  describe 'POST /baskets' do
+    let(:url) { baskets_url }
+    let(:parsed_json) { JSON.parse(response.body) }
+
+    context 'when creating a new basket' do
+      it 'should return a barebones basket' do
+        expect { post(url, params: {}) }.to(change { Basket.count }.from(0).to(1))
+        expect(response).to be_successful
+        expect(parsed_json['id']).to be_a_kind_of(Integer)
+        expect(parsed_json['id']).to eq(Basket.first.id)
+        expect(parsed_json['line_items']).to be_a_kind_of(Array)
+        expect(parsed_json['line_items'].length).to eq(0)
+      end
+    end
+  end
 end
