@@ -4,7 +4,7 @@
 class ProductsController < ApplicationController
   def create
     create_params = Products::CreateContract.validate!(params.to_unsafe_h)
-    @product = Product.create(create_params)
+    @product = Product.create!(create_params)
 
     render :create, formats: :json
   end
