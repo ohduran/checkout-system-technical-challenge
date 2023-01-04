@@ -1,1 +1,1 @@
-json.extract! basket, :id, :line_items
+json.extract! basket, :id, :line_items, :total

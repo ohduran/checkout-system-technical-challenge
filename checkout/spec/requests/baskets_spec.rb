@@ -11,7 +11,7 @@ RSpec.describe 'Baskets', type: :request do
 
     context 'when requesting all baskets' do
       before do
-        baskets.each { |basket| create_list(:line_item, 4, basket: basket) }
+        baskets.each { |basket| create_list(:line_item, 4, :with_offer, basket: basket) }
       end
       it 'should list all baskets' do
         get(url)
@@ -22,6 +22,7 @@ RSpec.describe 'Baskets', type: :request do
           expect(actual_basket['id']).to be_a_kind_of(Integer)
           expect(actual_basket['line_items']).to be_a_kind_of(Array)
           expect(actual_basket['line_items'].length).to eq(4)
+          expect(BigDecimal(actual_basket['total'])).to be_a_kind_of(BigDecimal)
         end
       end
     end
@@ -36,7 +37,7 @@ RSpec.describe 'Baskets', type: :request do
 
     context 'when requesting a certain basket' do
       before do
-        create_list(:line_item, 4, basket: basket)
+        create_list(:line_item, 4, :with_offer, basket: basket)
       end
       it 'should list all baskets' do
         get(url)
@@ -44,6 +45,8 @@ RSpec.describe 'Baskets', type: :request do
         expect(parsed_json['id']).to be_a_kind_of(Integer)
         expect(parsed_json['line_items']).to be_a_kind_of(Array)
         expect(parsed_json['line_items'].length).to eq(4)
+        expect(BigDecimal(parsed_json['total'])).to be_a_kind_of(BigDecimal)
+        expect(BigDecimal(parsed_json['total'])).to eq(basket.reload.total)
       end
     end
   end

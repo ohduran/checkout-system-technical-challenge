@@ -10,12 +10,12 @@ class BasketsController < ApplicationController
   end
 
   def index
-    @baskets = Basket.includes([:line_items]).all
+    @baskets = Basket.includes([line_items: :product]).all
     render :index, formats: :json
   end
 
   def show
-    @basket = Basket.find(params[:id])
+    @basket = Basket.includes([line_items: :product]).find(params[:id])
     render :show, formats: :json
   end
 end

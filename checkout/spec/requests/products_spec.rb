@@ -72,7 +72,7 @@ RSpec.describe 'Products', type: :request do
       it 'should return a barebones product' do
         post(url, params: params)
 
-        expect(response).to be_successful, parsed_json
+        expect(response).to be_successful
         expect(Product.count).to eq(1)
         expect(parsed_json['id']).to be_a_kind_of(Integer)
         expect(parsed_json['id']).to eq(Product.first.id)
