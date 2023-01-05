@@ -49,10 +49,6 @@ ActiveRecord::Schema[7.0].define(version: 20_221_230_153_003) do
     t.decimal 'price', precision: 2, scale: 9
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
-    t.integer 'offer_id'
     t.index ['code'], name: 'index_products_on_code', unique: true
-    t.index ['offer_id'], name: 'index_products_on_offer_id'
   end
-
-  add_foreign_key 'products', 'offers'
 end

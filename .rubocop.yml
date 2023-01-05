@@ -1,3 +1,14 @@
+AllCops:
+  Exclude:
+    - '**/db/migrate/*'
+    - '**/Gemfile.lock'
+    - '**/Rakefile'
+    - '**/rails'
+    - '**/vendor/**/*'
+    - '**/spec_helper.rb'
+    - 'bin/*'
+    - '**/schema.rb'
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -8,4 +19,7 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
+  Enabled: false
+
+Style/MixinUsage:
   Enabled: false
