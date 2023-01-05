@@ -24,6 +24,6 @@ class LineItem < ApplicationRecord
   end
 
   memoize def applicable_offers
-    product.offers.that_applies_to(self)
+    product.offers.that_apply_to(self)
   end
 end
