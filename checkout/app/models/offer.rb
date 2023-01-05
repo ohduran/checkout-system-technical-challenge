@@ -32,6 +32,9 @@ class Offer < ApplicationRecord
 
   validates :quantity_to_buy, numericality: { greater_than_or_equal_to: 1, only_integer: true }
 
+  # The offer gets applied only to eligible line_items
+  scope :that_applies_to, ->(line_item) { where('quantity_to_buy <= ?', line_item.quantity) }
+
   def discount(quantity:, product:)
     return 0 unless products.include?(product)
     return 0 unless quantity >= quantity_to_buy # weaker condition than in buyxgetx

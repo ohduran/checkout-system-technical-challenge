@@ -24,6 +24,6 @@ class LineItem < ApplicationRecord
   end
 
   memoize def applicable_offers
-    product.offers.where('quantity_to_buy <= ?', quantity)
+    product.offers.that_applies_to(self)
   end
 end
