@@ -56,11 +56,9 @@ class Offer < ApplicationRecord
       # validate that quantity_to_get is present for buyxgetx offers
       return 0 unless quantity_to_get.is_a?(Integer) && quantity_to_get.positive?
 
-      # Given that the quantities are integers, dividing quantity
-      # by the sum of _to_buy and _to_get does the job nicely.
-      # 3 / 2 = 1, 4 / 2 = 2, 5 / 2 = 2.
-      # 4 / 3 = 1, 5 / 3 = 1, 6 / 3 = 2.
-      discount_amount = quantity / (quantity_to_buy + quantity_to_get) * discount
+      # For each quantity_to_buy + quantity_to_get inside the whole quantity,
+      # add a quantity_to_get number of discounts to the discount_amount.
+      discount_amount = quantity * quantity_to_get / (quantity_to_buy + quantity_to_get) * discount
     when 'buyxalldropx'
       # The discount amount equals the number of items
       # times the individual discount.

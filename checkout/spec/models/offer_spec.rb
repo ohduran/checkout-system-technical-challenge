@@ -37,6 +37,34 @@ RSpec.describe Offer, type: :model do
       end
     end
 
+    context 'when there is a buy-five-get-two-free on Product GR2' do
+      let(:product) { create(:product, code: 'GR2') }
+      let!(:offer) do
+        create(:offer,
+               offer_type: :buyxgetx,
+               adjustment_type: :percentage,
+               quantity_to_buy: 5,
+               quantity_to_get: 2,
+               amount: 100,
+               products: [product])
+      end
+      context 'and there are four items' do
+        it 'calculates discount as zero' do
+          expect(offer.discount(quantity: 4, product: product)).to eq(0)
+        end
+      end
+      context 'and there are seven items' do
+        it 'calculates discount as two times the price of the product' do
+          expect(offer.discount(quantity: 7, product: product)).to eq(2 * product.price)
+        end
+      end
+      context 'and there are six items' do
+        it 'calculates discount as two times the price of the product' do
+          expect(offer.discount(quantity: 8, product: product)).to eq(2 * product.price)
+        end
+      end
+    end
+
     context 'when there is a 50 cent discount on all strawberries when you buy 3 or more' do
       let(:product) { create(:product, code: 'SR1') }
       let!(:offer) do
