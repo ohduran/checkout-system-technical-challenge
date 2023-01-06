@@ -8,7 +8,7 @@ This app will be able to add products to a cart and compute the total price. See
 
 Make sure that you have [Docker](https://www.docker.com/) installed on your computer.
 
-First, open a terminal and change directory to the project root and run `docker-compose build` in order to build the images.
+First, open a terminal, change directory to this project root folder and run `docker-compose build` in order to build the images.
 
 After that, we need to set up the database, run the migrations and preload some seed data that mimics the example baskets in the specification. For that, run the following command:
 
@@ -16,9 +16,9 @@ After that, we need to set up the database, run the migrations and preload some 
 docker-compose run --rm checkout bash -c "RAILS_ENV=development rails db:migrate && rails db:seed"
 ```
 
-Finally, bring the server up with `docker-compose up --build`. You can access the API from any GUI such as [Postman](https://www.postman.com/).
+Finally, bring the server up with `docker-compose up`. You can interact with the endpoints from any API GUI such as [Postman](https://www.postman.com/).
 
-Notice that by calling http://localhost/baskets, you'll find the three example baskets described in the spec. For the second basket, the total differs slightly from the expected value due to the fact that the offer was described in terms of "2/3 of the price", which was implemented as "66%".
+Notice that by calling http://localhost/baskets, you'll find the example baskets described in the spec. For the second basket, the total differs slightly from the expected value due to the fact that the offer was described in terms of "2/3 of the price", which was implemented as "66%".
 
 ## Data Model
 
@@ -54,11 +54,13 @@ I created some tests for Buy 1 Get 1 to confirm that this worked and, noticing t
 discount_amount = quantity / (quantity_to_buy + quantity_to_get) * discount
 ```
 
-As I was writing this, I noticed that this would not work when quantity_to_get was different from one, that is, offers such as Buy 5 Get 2, because for each quantity_to_buy number of items, a number of quantity_to_get must receive a discount *for each item*. Finally, the last iteration looked like this:
+As I was writing this, I noticed that this would not work when quantity_to_get was different from 1, that is, offers such as Buy 5 Get 2, because for each quantity_to_buy number of items, a number of quantity_to_get must receive a discount *for each item*. Finally, the last iteration looked like this:
 
 ```rb
 discount_amount = quantity * quantity_to_get / (quantity_to_buy + quantity_to_get) * discount
 ```
+
+---
 
 In order to introduce the use case where if you buy 3 or more strawberries, the price should drop to 4.50€, the code should be adapted for the buyxalldropx offer type. Since the offer type and the adjustment type were decoupled from each other, it followed naturally that these must be considered separately.
 
@@ -66,7 +68,7 @@ Hence, the discount amount is now calculated in two parts:
 
 1. Based on the adjustment type, calculate the "discount units", which would be the offer amount for the *value* adjustment type, and the price of the product times the amount percentage for the *percentage* adjustment type.
 
-2. Based on the offer type, calculate the "increments" of discount units that would add up the discount amount. For buyxgetx offer types, the calculation was described above; for buyxalldropx, the calculation was even simpler, as the discount amount would be the units of discount times the number of items, since all items received a discount.
+2. Based on the offer type, calculate the "increments" of discount units that would add up the discount amount. For buyxgetx offer types, the calculation was described above; for buyxalldropx, the calculation is even simpler, as the discount amount would be the units of discount times the number of items, since all items received a discount.
 
 ## Why not move logic away from the model?
 
@@ -76,9 +78,9 @@ Given the simplicity of the project, I could just say that the complexity did no
 
 There are two important advantages to keep a "fat model":
 
-- First and foremost, it *binds the language we use to speak about the project with the implementation*. I can still reason in terms of Products, Offers and Baskets. Products have Offers, and they apply to LineItems within a Basket. No DiscountCalculators or LineItemValidators were involved in the conversation, nor should they be involved in the conversation either.
+- First and foremost, it *binds the language we use to speak about the project with the implementation*. I can still reason in terms of Products, Offers and Baskets. The way we describe how Baskets, Products, Offers, and LineItems interact with each other need no intermediate DiscountCalculators or LineItemValidators, thus they should not be present in the code.
 
-- And second, *change amplification*. Should this project grow in complexity, introducing subtle bugs were, for instance, two line items are added bypassing validations that are external to the model, are way easier if the model validation is not tighly coupled with the model itself; otherwise, every time a line item gets added, the developer must keep in mind including the validation as well.
+- And second, *change amplification and cognitive load*. Should this project grow in complexity, subtle bugs were, for instance, line items are added bypassing validations are way easier to introduce if the model validation is not tighly coupled with the model itself; otherwise, every time a line item gets added, the developer must keep in mind including the validation as well.
 
 ## Extension ideas
 
