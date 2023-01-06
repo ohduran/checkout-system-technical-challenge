@@ -1,8 +1,8 @@
 # Checkout System
 
-You are the developer in charge of building a cash register.
+This is a [Rails](https://rubyonrails.org/) application that powers the common use cases for a cash register.
 
-This app will be able to add products to a cart and compute the total price. See objectives and technical specification in the [Technical Specification file](./TECHNICAL_SPECIFICATION.md)
+This app will be able to add products to a cart and compute the total price. See objectives and technical specification in the [Technical Specification file](./TECHNICAL_SPECIFICATION.md).
 
 ## How to Bring the server up
 
@@ -20,7 +20,7 @@ Finally, bring the server up with `docker-compose up`. You can interact with the
 
 Notice that by calling http://localhost/baskets, you'll find the example baskets described in the spec. For the second basket, the total differs slightly from the expected value due to the fact that the offer was described in terms of "2/3 of the price", which was implemented as "66%".
 
-## Data Model
+## Data Model
 
 The project data model revolves around the Basket model. This model encapsulates a collection of LineItems, and its total is calculated as the sum of the totals of each of those LineItems.
 
@@ -36,7 +36,7 @@ Incidentally, by structuring offers this way, a potential use case has been impl
 
 ## Discount Calculation
 
-The first iteration for percentage based offers was this:
+The first iteration for calculating percentage based offer discounts was this:
 
 ```rb
 counter = quantity
@@ -70,17 +70,19 @@ Hence, the discount amount is now calculated in two parts:
 
 2. Based on the offer type, calculate the "increments" of discount units that would add up the discount amount. For buyxgetx offer types, the calculation was described above; for buyxalldropx, the calculation is even simpler, as the discount amount would be the units of discount times the number of items, since all items received a discount.
 
+See [Offer#discount](checkout/app/models/offer.rb) for more.
+
 ## Why not move logic away from the model?
 
-One valid question that can be raised is whether the logic for the discount calculation could be separated into a different function, or the model validation line_items_cannot_belong_to_the_same_product could be split from the LineItem model.
+One valid question that can be raised is whether the logic for the discount calculation could be separated into a different function, or the model validation `line_items_cannot_belong_to_the_same_product` could be split from the LineItem model.
 
-Given the simplicity of the project, I could just say that the complexity did not justify the separation yet, but the way I see it, the complexity threshold for separating it into a different part of the project is higher than one at first sight could say.
+In my opinion, there are two important advantages to keep a "fat model":
 
-There are two important advantages to keep a "fat model":
+- First and foremost, it *binds the language we use to speak about the project with the implementation*. I can still reason in terms familiar to non-technical team members. The way we describe how Baskets, Products, Offers, and LineItems interact with each other need no intermediate DiscountCalculators or LineItemValidators, thus they should not be present in the code. As a consequence, *it improves test readability and discoverability*, since test descriptions are understandable by non-technical team mates, who can contribute to the conversation in the spirit of [Behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driven_development).
 
-- First and foremost, it *binds the language we use to speak about the project with the implementation*. I can still reason in terms of Products, Offers and Baskets. The way we describe how Baskets, Products, Offers, and LineItems interact with each other need no intermediate DiscountCalculators or LineItemValidators, thus they should not be present in the code.
+- Second, *change amplification and cognitive load*. Should this project grow in complexity, subtle bugs are way easier to introduce if, for instance, the model validation is not tighly coupled with the model itself; otherwise, every time a line item gets added, the developer must keep in mind including the validation as well. The model is then a meaningful gateway into the database, so that operations performed on the model make sense externally without the need to know about internal implementation details.
 
-- And second, *change amplification and cognitive load*. Should this project grow in complexity, subtle bugs were, for instance, line items are added bypassing validations are way easier to introduce if the model validation is not tighly coupled with the model itself; otherwise, every time a line item gets added, the developer must keep in mind including the validation as well.
+These arguments informed the decision to [Refactor discount method into Offer model](https://github.com/ohduran/checkout-system-technical-challenge/commit/82e0d96c9351d3b9de8dcfba2755aaf834b14563), [Prevent inconsistencies in Basket](https://github.com/ohduran/checkout-system-technical-challenge/commit/37d2afb6598bcadca651cb3d8a17c4249c09afcf) and [Refactor LineItem#applicable_offers](https://github.com/ohduran/checkout-system-technical-challenge/commit/b7d0d32530e3052ebc0dfdcb715998cdf4ee41f0).
 
 ## Extension ideas
 
